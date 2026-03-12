@@ -156,9 +156,14 @@ const LandingPage = () => {
       <footer className="border-t border-border/30 py-8 px-6">
         <div className="container mx-auto flex items-center justify-between">
           <p className="text-muted-foreground text-sm">© 2026 Sistema Ponto. Todos os direitos reservados.</p>
-          <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-muted-foreground" />
-            <span className="text-muted-foreground text-sm">Pagamento seguro</span>
+          <div className="flex items-center gap-4">
+            <Link to="/termos" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+              Termos de Uso
+            </Link>
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground text-sm">Pagamento seguro</span>
+            </div>
           </div>
         </div>
       </footer>

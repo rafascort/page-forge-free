@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
   Upload, Play, FileText, Brain, Calendar,
   AlertTriangle, CreditCard, X, ArrowLeft
@@ -11,17 +11,17 @@ import { useUserPlan } from "@/hooks/useUserPlan";
 
 const aiModels = [
   {
-    id: "6",
-    name: "IA Geral",
-    subtitle: "Sem Data",
-    desc: "Extração padrão sem processamento de datas",
+    id: "holerite-padrao",
+    name: "IA Holerite",
+    subtitle: "Padrão",
+    desc: "Extração de campos comuns: salário, descontos, FGTS, INSS",
     icon: Brain,
   },
   {
-    id: "7",
-    name: "IA Geral",
-    subtitle: "Com Data",
-    desc: "Extração completa com reconhecimento de datas",
+    id: "holerite-completo",
+    name: "IA Holerite",
+    subtitle: "Completo",
+    desc: "Extração detalhada com rubricas, adicionais e benefícios",
     icon: Calendar,
   },
 ];
@@ -41,7 +41,7 @@ function parsePageRange(range: string): number {
   return total;
 }
 
-const MainAppPage = () => {
+const HoleriteExtractorPage = () => {
   const { plan } = useUserPlan();
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -75,10 +75,10 @@ const MainAppPage = () => {
     if (!pageRange.trim()) { toast.warning("Informe o intervalo de páginas."); return; }
     if (!hasEnoughPages) { setShowLimitAlert(true); return; }
     setIsProcessing(true);
-    toast.info(`Processando ${pagesToConsume} página(s)...`);
+    toast.info(`Processando ${pagesToConsume} holerite(s)...`);
     setTimeout(() => {
       setIsProcessing(false);
-      toast.success("Processamento concluído!");
+      toast.success("Processamento de holerites concluído!");
     }, 3000);
   };
 
@@ -92,7 +92,7 @@ const MainAppPage = () => {
             <Link to="/app" className="text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <h3 className="text-lg font-semibold text-foreground">Extrator de Ponto</h3>
+            <h3 className="text-lg font-semibold text-foreground">Extrator de Holerite</h3>
           </div>
 
           {limitReached && (
@@ -118,7 +118,6 @@ const MainAppPage = () => {
             </motion.div>
           )}
 
-          <h3 className="text-lg font-semibold text-foreground mb-4">Selecione o Modelo de IA</h3>
           <div className="grid md:grid-cols-2 gap-4 mb-8">
             {aiModels.map((model) => (
               <motion.div
@@ -234,4 +233,4 @@ const MainAppPage = () => {
   );
 };
 
-export default MainAppPage;
+export default HoleriteExtractorPage;
