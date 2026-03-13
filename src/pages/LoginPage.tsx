@@ -3,12 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,11 +19,16 @@ const LoginPage = () => {
       return;
     }
     setIsLoading(true);
-    // Simulate login — replace with real API
-    await new Promise((r) => setTimeout(r, 1000));
-    toast.success("Login realizado com sucesso!");
-    navigate("/app");
-    setIsLoading(false);
+    try {
+      await login(email, password);
+      toast.success("Login realizado com sucesso!");
+      navigate("/app");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro ao fazer login.";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

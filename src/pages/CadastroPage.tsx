@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, User, Sparkles, UserPlus } from "lucide-react";
+import { Mail, Lock, Sparkles, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CadastroPage = () => {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleCadastro = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +24,16 @@ const CadastroPage = () => {
       return;
     }
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    toast.success("Conta criada! Você ganhou 50 páginas grátis. Redirecionando...");
-    setTimeout(() => navigate("/login"), 1500);
-    setIsLoading(false);
+    try {
+      await register(email, password);
+      toast.success("Conta criada! Você ganhou 50 páginas grátis. Redirecionando...");
+      setTimeout(() => navigate("/login"), 1500);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro ao criar conta.";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -45,20 +52,6 @@ const CadastroPage = () => {
           </div>
         </div>
         <form onSubmit={handleCadastro} className="flex flex-col gap-4">
-          <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">Nome</label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Seu nome"
-                className="w-full pl-10 pr-4 py-3 bg-background/60 border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                required
-              />
-            </div>
-          </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-2 block">E-mail</label>
             <div className="relative">
