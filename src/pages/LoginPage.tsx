@@ -39,9 +39,16 @@ const LoginPage = () => {
         initial={{ opacity: 0, y: 20, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="glass-card p-10 w-full max-w-md"
+        className="glass-card p-10 w-full max-w-md relative"
       >
-        <div className="text-center mb-8">
+        <Link
+          to="/"
+          className="absolute top-4 left-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Voltar
+        </Link>
+        <div className="text-center mb-8 mt-4">
           <h2 className="text-2xl font-bold text-foreground">Sistema Ponto</h2>
           <p className="text-muted-foreground text-sm mt-2">Acesse sua conta</p>
         </div>
