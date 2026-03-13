@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { LogOut, CreditCard, Settings, ChevronDown, Headset } from "lucide-react";
+import { LogOut, CreditCard, Settings, ChevronDown } from "lucide-react";
 import StatusWidget from "@/components/StatusWidget";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/popover";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-const WHATSAPP_URL = "https://wa.me/5511999999999?text=Olá! Preciso de suporte no Sistema Ponto.";
 
 const STRIPE_PRICE_IDS: Record<string, string> = {
   basic: import.meta.env.VITE_STRIPE_PRICE_ID_BASICO || "",
@@ -64,16 +63,6 @@ const AppHeader = () => {
           extraPages={plan.extraPages}
           isLoading={planLoading}
         />
-
-        <a
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-secondary/60 transition-all text-muted-foreground hover:text-success"
-          title="Suporte via WhatsApp"
-        >
-          <Headset className="w-5 h-5" />
-        </a>
 
         <Popover>
           <PopoverTrigger asChild>
