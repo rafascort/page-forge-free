@@ -1,19 +1,54 @@
 import { Link } from "react-router-dom";
-import { LogOut, User, CreditCard, Settings, ChevronDown } from "lucide-react";
+import { LogOut, CreditCard, Settings, ChevronDown } from "lucide-react";
 import StatusWidget from "@/components/StatusWidget";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+
+const STRIPE_PRICE_IDS: Record<string, string> = {
+  basic: import.meta.env.VITE_STRIPE_PRICE_ID_BASICO || "",
+  standard: import.meta.env.VITE_STRIPE_PRICE_ID_PADRAO || "",
+  premium: import.meta.env.VITE_STRIPE_PRICE_ID_PREMIUM || "",
+};
 
 const AppHeader = () => {
   const { plan, isLoading: planLoading } = useUserPlan();
+  const { logout } = useAuth();
 
   const userEmail = plan.email || "usuario@email.com";
   const initials = userEmail.substring(0, 2).toUpperCase();
+
+  const handleManageSubscription = async () => {
+    if (plan.planStatus === "free") {
+      // Redirect to pricing
+      window.location.href = "/#pricing";
+      return;
+    }
+    // For paid plans, could open Stripe portal — for now redirect to pricing
+    window.location.href = "/#pricing";
+  };
+
+  const handleUpgrade = async (planKey: string) => {
+    const priceId = STRIPE_PRICE_IDS[planKey];
+    if (!priceId) {
+      toast.error("Plano não disponível no momento.");
+      return;
+    }
+    try {
+      const { url } = await api.createCheckoutSession(priceId);
+      window.location.href = url;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro ao iniciar checkout.";
+      toast.error(message);
+    }
+  };
 
   return (
     <header className="flex items-center justify-between px-6 py-3 bg-background/80 backdrop-blur-xl border-b border-border/30 shrink-0">
@@ -59,20 +94,20 @@ const AppHeader = () => {
               </div>
               {plan.extraPages > 0 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">Extras</span>
-                  <span className="text-sm font-semibold text-success">+{plan.extraPages} páginas</span>
+                  <span className="text-sm text-foreground">Extras consumidas</span>
+                  <span className="text-sm font-semibold text-warning">{plan.extraPages} páginas</span>
                 </div>
               )}
             </div>
 
             <div className="p-2">
-              <Link
-                to="/#pricing"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-secondary/60 transition-all w-full"
+              <button
+                onClick={handleManageSubscription}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-secondary/60 transition-all w-full text-left"
               >
                 <CreditCard className="w-4 h-4 text-muted-foreground" />
                 Gerenciar Assinatura
-              </Link>
+              </button>
               <Link
                 to="/termos"
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-secondary/60 transition-all w-full"
@@ -80,13 +115,13 @@ const AppHeader = () => {
                 <Settings className="w-4 h-4 text-muted-foreground" />
                 Termos de Uso
               </Link>
-              <Link
-                to="/"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all w-full"
+              <button
+                onClick={logout}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all w-full text-left"
               >
                 <LogOut className="w-4 h-4" />
                 Sair
-              </Link>
+              </button>
             </div>
           </PopoverContent>
         </Popover>

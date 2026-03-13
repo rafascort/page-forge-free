@@ -1,28 +1,29 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, Play, FileText, Brain, Calendar,
-  AlertTriangle, CreditCard, X, ArrowLeft
+  AlertTriangle, CreditCard, X, ArrowLeft, Download, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import AppHeader from "@/components/AppHeader";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { api } from "@/lib/api";
 
 const aiModels = [
-  {
-    id: "6",
-    name: "IA Geral",
-    subtitle: "Sem Data",
-    desc: "Extração padrão sem processamento de datas",
-    icon: Brain,
-  },
   {
     id: "7",
     name: "IA Geral",
     subtitle: "Com Data",
     desc: "Extração completa com reconhecimento de datas",
     icon: Calendar,
+  },
+  {
+    id: "6",
+    name: "IA Geral",
+    subtitle: "Sem Data",
+    desc: "Extração padrão sem processamento de datas",
+    icon: Brain,
   },
 ];
 
@@ -42,12 +43,15 @@ function parsePageRange(range: string): number {
 }
 
 const MainAppPage = () => {
-  const { plan } = useUserPlan();
+  const { plan, refreshUser } = useUserPlan();
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pageRange, setPageRange] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showLimitAlert, setShowLimitAlert] = useState(false);
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const pagesToConsume = useMemo(() => parsePageRange(pageRange), [pageRange]);
   const hasEnoughPages = plan.pageBalance >= pagesToConsume;
@@ -69,17 +73,69 @@ const MainAppPage = () => {
     input.click();
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!selectedModel) { toast.warning("Selecione um modelo de IA."); return; }
     if (!selectedFile) { toast.warning("Importe um arquivo PDF."); return; }
     if (!pageRange.trim()) { toast.warning("Informe o intervalo de páginas."); return; }
     if (!hasEnoughPages) { setShowLimitAlert(true); return; }
+
     setIsProcessing(true);
-    toast.info(`Processando ${pagesToConsume} página(s)...`);
-    setTimeout(() => {
+    setTaskId(null);
+    toast.info(`Enviando ${pagesToConsume} página(s) para processamento...`);
+
+    try {
+      const result = await api.processDirectPDF(selectedFile, pageRange);
+      setTaskId(result.task_id);
+      toast.success("PDF enviado! Processamento em andamento...");
+      startPolling(result.task_id);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro ao processar PDF.";
+      toast.error(message);
       setIsProcessing(false);
-      toast.success("Processamento concluído!");
-    }, 3000);
+    }
+  };
+
+  const startPolling = (id: string) => {
+    // Poll every 5 seconds to check if result is ready
+    pollingRef.current = setInterval(async () => {
+      try {
+        const blob = await api.downloadResult(id);
+        // If we get here, the file is ready
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        setIsProcessing(false);
+        toast.success("Processamento concluído!");
+        triggerDownload(blob, `resultado_${id}.xlsx`);
+        await refreshUser();
+      } catch {
+        // Still processing, continue polling
+      }
+    }, 5000);
+  };
+
+  const triggerDownload = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleManualDownload = async () => {
+    if (!taskId) return;
+    setIsDownloading(true);
+    try {
+      const blob = await api.downloadResult(taskId);
+      triggerDownload(blob, `resultado_${taskId}.xlsx`);
+      await refreshUser();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro ao baixar resultado.";
+      toast.error(message);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -183,9 +239,31 @@ const MainAppPage = () => {
             disabled={isProcessing || limitReached || (pagesToConsume > 0 && !hasEnoughPages)}
             className="w-full mt-6 gradient-primary text-primary-foreground py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/25 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
           >
-            <Play className="w-5 h-5" />
-            {isProcessing ? "Processando..." : "Iniciar"}
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              <>
+                <Play className="w-5 h-5" />
+                Iniciar
+              </>
+            )}
           </button>
+
+          {taskId && !isProcessing && (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              onClick={handleManualDownload}
+              disabled={isDownloading}
+              className="w-full mt-3 py-3 rounded-xl border border-primary/40 text-primary font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/10 transition-all disabled:opacity-50"
+            >
+              {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              Baixar Resultado Novamente
+            </motion.button>
+          )}
         </div>
       </main>
 
