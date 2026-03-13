@@ -44,8 +44,15 @@ const CadastroPage = () => {
         initial={{ opacity: 0, y: 20, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="glass-card p-10 w-full max-w-md"
+        className="glass-card p-10 w-full max-w-md relative"
       >
+        <Link
+          to="/"
+          className="absolute top-4 left-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Voltar
+        </Link>
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-foreground">Criar Conta</h2>
           <div className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full bg-success/15 border border-success/30">
