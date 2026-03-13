@@ -96,6 +96,15 @@ const LoginPage = () => {
             Cadastre-se
           </Link>
         </p>
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground hover:text-success transition-colors"
+        >
+          <MessageCircle className="w-4 h-4" />
+          Entre em contato pelo WhatsApp
+        </a>
       </motion.div>
     </div>
   );

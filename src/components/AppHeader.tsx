@@ -65,6 +65,16 @@ const AppHeader = () => {
           isLoading={planLoading}
         />
 
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-secondary/60 transition-all text-muted-foreground hover:text-success"
+          title="Suporte via WhatsApp"
+        >
+          <Headset className="w-5 h-5" />
+        </a>
+
         <Popover>
           <PopoverTrigger asChild>
             <button className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/60 transition-all">
