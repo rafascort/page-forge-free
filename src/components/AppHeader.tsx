@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { LogOut, CreditCard, Settings, ChevronDown } from "lucide-react";
+import { LogOut, CreditCard, Settings, ChevronDown, Headset } from "lucide-react";
 import StatusWidget from "@/components/StatusWidget";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { useAuth } from "@/contexts/AuthContext";
