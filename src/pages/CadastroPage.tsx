@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, Sparkles, UserPlus } from "lucide-react";
+import { Mail, Lock, Sparkles, UserPlus, ArrowLeft, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+
+const WHATSAPP_URL = "https://wa.me/5511999999999?text=Olá! Tenho dúvidas sobre o Sistema Ponto.";
 
 const CadastroPage = () => {
   const [email, setEmail] = useState("");
@@ -42,8 +44,15 @@ const CadastroPage = () => {
         initial={{ opacity: 0, y: 20, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="glass-card p-10 w-full max-w-md"
+        className="glass-card p-10 w-full max-w-md relative"
       >
+        <Link
+          to="/"
+          className="absolute top-4 left-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Voltar
+        </Link>
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-foreground">Criar Conta</h2>
           <div className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full bg-success/15 border border-success/30">
@@ -109,6 +118,15 @@ const CadastroPage = () => {
             Login
           </Link>
         </p>
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground hover:text-success transition-colors"
+        >
+          <MessageCircle className="w-4 h-4" />
+          Entre em contato pelo WhatsApp
+        </a>
       </motion.div>
     </div>
   );
