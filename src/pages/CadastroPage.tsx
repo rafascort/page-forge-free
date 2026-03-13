@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, Sparkles, UserPlus } from "lucide-react";
+import { Mail, Lock, Sparkles, UserPlus, ArrowLeft, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+
+const WHATSAPP_URL = "https://wa.me/5511999999999?text=Olá! Tenho dúvidas sobre o Sistema Ponto.";
 
 const CadastroPage = () => {
   const [email, setEmail] = useState("");
