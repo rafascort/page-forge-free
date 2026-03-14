@@ -2,30 +2,13 @@ import { useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-  Upload, Play, FileText, Brain, Calendar,
+  Upload, Play, FileText,
   AlertTriangle, CreditCard, X, ArrowLeft, Download, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import AppHeader from "@/components/AppHeader";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { api } from "@/lib/api";
-
-const aiModels = [
-  {
-    id: "payroll",
-    name: "IA Holerite",
-    subtitle: "Padrão",
-    desc: "Extração de campos comuns: salário, descontos, FGTS, INSS",
-    icon: Brain,
-  },
-  {
-    id: "payroll-completo",
-    name: "IA Holerite",
-    subtitle: "Completo",
-    desc: "Extração detalhada com rubricas, adicionais e benefícios",
-    icon: Calendar,
-  },
-];
 
 function parsePageRange(range: string): number {
   if (!range.trim()) return 0;
@@ -44,7 +27,6 @@ function parsePageRange(range: string): number {
 
 const HoleriteExtractorPage = () => {
   const { plan, refreshUser } = useUserPlan();
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pageRange, setPageRange] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -74,7 +56,6 @@ const HoleriteExtractorPage = () => {
   };
 
   const handleStart = async () => {
-    if (!selectedModel) { toast.warning("Selecione um modelo de IA."); return; }
     if (!selectedFile) { toast.warning("Importe um arquivo PDF."); return; }
     if (!pageRange.trim()) { toast.warning("Informe o intervalo de páginas."); return; }
     if (!hasEnoughPages) { setShowLimitAlert(true); return; }
@@ -171,35 +152,6 @@ const HoleriteExtractorPage = () => {
               </Link>
             </motion.div>
           )}
-
-          <div className="grid md:grid-cols-2 gap-4 mb-8">
-            {aiModels.map((model) => (
-              <motion.div
-                key={model.id}
-                whileHover={{ y: -3 }}
-                onClick={() => setSelectedModel(model.id)}
-                className={`relative cursor-pointer rounded-xl p-6 border backdrop-blur-sm transition-all duration-300 ${
-                  selectedModel === model.id
-                    ? "bg-primary/10 border-primary/60 shadow-[0_0_20px_rgba(74,158,255,0.2)]"
-                    : "bg-card/50 border-border/40 hover:border-primary/30 hover:shadow-[0_0_15px_rgba(74,158,255,0.1)]"
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedModel === model.id ? "gradient-primary" : "bg-secondary"}`}>
-                    <model.icon className={`w-6 h-6 ${selectedModel === model.id ? "text-primary-foreground" : "text-primary"}`} />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-semibold text-foreground">{model.name}</h4>
-                    <p className="text-primary text-sm font-medium">{model.subtitle}</p>
-                    <p className="text-muted-foreground text-xs mt-1">{model.desc}</p>
-                  </div>
-                </div>
-                {selectedModel === model.id && (
-                  <div className="absolute top-3 right-3 w-3 h-3 rounded-full gradient-primary" />
-                )}
-              </motion.div>
-            ))}
-          </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
             <button
