@@ -11,6 +11,7 @@ import ServiceSelectionPage from "./pages/ServiceSelectionPage";
 import MainAppPage from "./pages/MainAppPage";
 import HoleriteExtractorPage from "./pages/HoleriteExtractorPage";
 import TermosPage from "./pages/TermosPage";
+import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/app" element={<ProtectedRoute><ServiceSelectionPage /></ProtectedRoute>} />
             <Route path="/app/ponto" element={<ProtectedRoute><MainAppPage /></ProtectedRoute>} />
             <Route path="/app/holerite" element={<ProtectedRoute><HoleriteExtractorPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/termos" element={<TermosPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
