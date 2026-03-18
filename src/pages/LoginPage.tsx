@@ -22,6 +22,14 @@ const LoginPage = () => {
     }
     setIsLoading(true);
     try {
+      // Bypass para teste: admin@gmail.com vai direto para /admin
+      if (email.toLowerCase() === "admin@gmail.com") {
+        localStorage.setItem("access_token", "test-admin-token");
+        toast.success("Login admin (teste)!");
+        navigate("/admin");
+        setIsLoading(false);
+        return;
+      }
       await login(email, password);
       toast.success("Login realizado com sucesso!");
       navigate("/app");

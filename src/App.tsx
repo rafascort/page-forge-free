@@ -29,6 +29,7 @@ const App = () => (
             <Route path="/app" element={<ProtectedRoute><ServiceSelectionPage /></ProtectedRoute>} />
             <Route path="/app/ponto" element={<ProtectedRoute><MainAppPage /></ProtectedRoute>} />
             <Route path="/app/holerite" element={<ProtectedRoute><HoleriteExtractorPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
             <Route path="/termos" element={<TermosPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
